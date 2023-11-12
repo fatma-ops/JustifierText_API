@@ -1,5 +1,5 @@
 const { app } = require('./app');
-import { PORT } from './env';
+const { PORT } = require('./env');
 
 
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
