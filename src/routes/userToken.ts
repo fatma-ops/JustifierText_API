@@ -23,8 +23,8 @@ tokenRouter.post('/token', async (req, res) => {
   try {
     await DataBase.query('INSERT INTO users(email) VALUES ($1) ON CONFLICT DO NOTHING', [email]);
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: 'internal error' });
+    return res.status(500).json({ error: 'internal server error' });
+
   }
 
   return res.status(200).json(token);
