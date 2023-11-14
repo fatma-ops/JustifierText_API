@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken';
 
 // Importation de la clé secrète du token et la durée de validité du token depuis le fichier '../env'
-import { TOKEN_SECRET , TOKEN_EXPIRE} from '../env';
+import { TOKEN_SECRET} from '../env';
 
 // Fonction pour créer un token d'authentification avec une expiration de 24 heures
 const createToken = (email: string): string => {
