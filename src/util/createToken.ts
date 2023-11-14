@@ -9,7 +9,7 @@ import { TOKEN_SECRET , TOKEN_EXPIRE} from '../env';
 const createToken = (email: string): string => {
   // Signature du token en utilisant l'adresse e-mail et la clé secrète
   // L'option expiresIn définit la durée de validité du token (ici, 24 heures)
-  return jwt.sign({ email }, TOKEN_SECRET as string, { expiresIn: TOKEN_EXPIRE });
+  return jwt.sign({ email }, TOKEN_SECRET as string);
 };
 
 // Exportation de la fonction pour permettre son utilisation dans d'autres fichiers
