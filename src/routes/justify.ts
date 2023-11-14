@@ -48,45 +48,45 @@ const justifier = (str: string, len: number): string => {
   };
   
 
-justifierRouter.post('/justify', authenticationToken, async (req, res) => {
-
-  const text: string = req.body;
-  console.log(text)
-  if (typeof text !== 'string') {
-    return res.status(400).json({ error: 'Le text doit être du type text/plain' });
-  }
-
-  const words = text.trim().split(/\s+/).length;
-  if (words > 80000) return res.status(402).json({ error: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
-
-  try {
-    // @ts-ignore
-    const getUser = await DataBase.query('SELECT last_used, nbr_mot FROM users WHERE email = $1', [req.user]);
-
-    if (!getUser.rows[0]) return res.status(403).json({ error: "Le user n'existe pas " });
-
-    let updatedLimitRate: number;
-    if (new Date().getTime() - getUser.rows[0].last_used.getTime() >= 86400000) updatedLimitRate = words;
-    else updatedLimitRate = words + getUser.rows[0].limit_rate;
-
-    if (updatedLimitRate > 80000) return res.status(402).json({ error: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
-    else {
-      const updateUser = await DataBase.query(
-        'UPDATE users SET nbr_mot = $1, last_used = CURRENT_DATE WHERE email = $2',
-        // @ts-ignore
-        [updatedLimitRate, req.user]
-      );
-
-      console.log(updateUser);
+  justifierRouter.post('/justify', authenticationToken, async (req, res) => {
+    const text: string = req.body;
+      console.log('Requête POST reçue sur /api/justify');
+  
+    if (typeof text !== 'string') {
+      return res.status(400).json({ error: 'body must be of type text/plain' });
     }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: 'internal error' });
-  }
-
-  const justifiedText = justifier(text, 80);
-  return res.setHeader('Content-Type', 'text/plain').status(200).send(justifiedText);
-});
-
-export { justifierRouter };
+  
+    const words = text.trim().split(/\s+/).length;
+    if (words > 80000) return res.status(402).json({ error: 'daily limit rate of 80000 words reached' });
+  
+    try {
+      // @ts-ignore
+      const getUser = await poolPG.query('SELECT last_used, limit_rate FROM users WHERE email = $1', [req.user]);
+  
+      if (!getUser.rows[0]) return res.status(403).json({ error: "user doesn't exist" });
+  
+      let updatedLimitRate: number;
+      if (new Date().getTime() - getUser.rows[0].last_used.getTime() >= 86400000) updatedLimitRate = words;
+      else updatedLimitRate = words + getUser.rows[0].limit_rate;
+  
+      if (updatedLimitRate > 80000) return res.status(402).json({ error: 'daily limit rate of 80000 words reached' });
+      else {
+        const updateUser = await DataBase.query(
+          'UPDATE users SET nbr_mot = $1, last_used = CURRENT_DATE WHERE email = $2',
+          // @ts-ignore
+          [updatedLimitRate, req.user]
+        );
+  
+        console.log(updateUser);
+      }
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: 'internal error' });
+    }
+  
+    const justifiedText = justifier(text, 80);
+    return res.setHeader('Content-Type', 'text/plain').status(200).send(justifiedText);
+  });
+  
+  export { justifierRouter };
 
