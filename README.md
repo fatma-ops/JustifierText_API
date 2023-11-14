@@ -16,7 +16,7 @@ Ce projet met en œuvre une API REST pour justifier un texte fourni en paramètr
    Le fichier db.js gère la connexion à la base de données PostgreSQL, crée la table "users" et expose une instance de Pool pour l'utilisation dans d'autres modules.
    Authentification
 2) Authentification:
-   Le module createToken dans util/createToken.ts génère un token JWT avec une expiration de 24 heures.
+   Le module createToken dans util/createToken.ts génère un token JWT .
    Le middleware authenticationToken dans middlewares/authmiddlewares.ts vérifie et décode les tokens JWT pour l'authentification.
 3) Routes:
    Le router principal dans routes/index.ts combine les routes des justifications et des tokens.
