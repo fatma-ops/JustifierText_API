@@ -36,8 +36,27 @@ Ce projet met en œuvre une API REST pour justifier un texte fourni en paramètr
 # Run the project 
 - npm start
 # Déploiement
-- Le code a été déployé sur Render, et la base de données a été déployée sur Vercel. Assurez-vous de configurer les variables d'environnement appropriées pour chaque 
-  plateforme.
+. Le code a été déployé sur Render, et la base de données a été déployée sur Vercel. Assurez-vous de configurer les 
+  variables d'environnement appropriées pour chaque plateforme.
+  (https://dashboard.render.com/ ) , (https://vercel.com/login)
+. Vous pouvez accéder à l'application en suivant ce lien : https://final-testt.onrender.com/api/
+
+# Base URL 
+Si vous souhaitez utiliser l'API localement, vous pouvez effectuer des requêtes en utilisant l'adresse http://127.0.0.1:3000. Voiciles endpoints :
+- Obtenir un token d'authentification : `http://127.0.0.1:3000/api/token` (méthode POST avec un corps JSON `{"email": "votre@email.com"}`)
+- Justifier un texte : `http://127.0.0.1:3000/api/justifier` (méthode POST avec un corps de type texte et l'en-tête d'autorisation
+-  <img width="627" alt="image" src="https://github.com/fatma-ops/ticatrip/assets/73761826/3817ce50-162a-42b2-87b6-ac89c73128f7">
+
+<img width="674" alt="image" src="https://github.com/fatma-ops/ticatrip/assets/73761826/c024ee3c-8d09-4403-b0d6-73154d59cebf">
+
+
+
+
+  
+
+
+
+
 
 
 
