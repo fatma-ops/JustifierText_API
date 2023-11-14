@@ -48,66 +48,45 @@ const justifier = (str: string, len: number): string => {
   };
   
 
-// Définition d'une route POST '/justifier' sur le router justifierRouter, avec le middleware d'authentification
-justifierRouter.post('/justifier', authenticationToken, async (req, res) => {
-  // Récupération du texte à justifier depuis le corps de la requête
-  const texte: string = req.body;
-  console.log(texte);
+justifierRouter.post('/justify', authenticationToken, async (req, res) => {
 
-  // Vérification si le texte est une chaîne de caractères
-  if (typeof texte !== 'string') {
-    return res.status(400).json({ erreur: 'Le texte doit être du type text/plain' });
+  const text: string = req.body;
+  console.log(text)
+  if (typeof text !== 'string') {
+    return res.status(400).json({ error: 'Le text doit être du type text/plain' });
   }
 
-  // Calcul du nombre de mots dans le texte
-  const mots = texte.trim().split(/\s+/).length;
-
-  // Vérification si le nombre de mots dépasse la limite quotidienne de 80 000
-  if (mots > 80000) return res.status(402).json({ erreur: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
+  const words = text.trim().split(/\s+/).length;
+  if (words > 80000) return res.status(402).json({ error: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
 
   try {
-    // Récupération des informations utilisateur (last_used, nbr_mot) depuis la base de données
     // @ts-ignore
     const getUser = await DataBase.query('SELECT last_used, nbr_mot FROM users WHERE email = $1', [req.user]);
 
-    // Vérification si l'utilisateur existe
-    if (!getUser.rows[0]) return res.status(403).json({ erreur: "L'utilisateur n'existe pas" });
+    if (!getUser.rows[0]) return res.status(403).json({ error: "Le user n'existe pas " });
 
-    let limiteQuotidienneMots: number;
+    let updatedLimitRate: number;
+    if (new Date().getTime() - getUser.rows[0].last_used.getTime() >= 86400000) updatedLimitRate = words;
+    else updatedLimitRate = words + getUser.rows[0].limit_rate;
 
-    // Calcul de la nouvelle limite quotidienne en fonction de la dernière utilisation de l'utilisateur
-    if (new Date().getTime() - getUser.rows[0].last_used.getTime() >= 86400000) {
-      limiteQuotidienneMots = mots;
-    } else {
-      limiteQuotidienneMots = mots + getUser.rows[0].nbr_mot;
-    }
-
-    // Vérification si la nouvelle limite quotidienne dépasse 80 000 mots
-    if (limiteQuotidienneMots > 80000) {
-      return res.status(402).json({ erreur: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
-    } else {
-      // Mise à jour de la base de données avec la nouvelle limite quotidienne des mots et la date d'utilisation actuelle
+    if (updatedLimitRate > 80000) return res.status(402).json({ error: 'Vous avez atteint la limite quotidienne de 80 000 mots' });
+    else {
       const updateUser = await DataBase.query(
         'UPDATE users SET nbr_mot = $1, last_used = CURRENT_DATE WHERE email = $2',
         // @ts-ignore
-        [limiteQuotidienneMots, req.user]
+        [updatedLimitRate, req.user]
       );
 
       console.log(updateUser);
     }
   } catch (err) {
-    // Gestion des erreurs lors de l'accès à la base de données
     console.log(err);
-    return res.status(500).json({ erreur: 'Erreur interne' });
+    return res.status(500).json({ error: 'internal error' });
   }
 
-  // Justification du texte et envoi de la réponse avec le texte justifié
-  const texteJustifié = justifier(texte, 80);
-  return res.setHeader('Content-Type', 'text/plain').status(200).send(texteJustifié);
+  const justifiedText = justifier(text, 80);
+  return res.setHeader('Content-Type', 'text/plain').status(200).send(justifiedText);
 });
 
-// Exportation du router pour permettre son utilisation dans d'autres fichiers
 export { justifierRouter };
-
-
 
