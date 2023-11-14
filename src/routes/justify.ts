@@ -61,7 +61,7 @@ const justifier = (str: string, len: number): string => {
   
     try {
       // @ts-ignore
-      const getUser = await poolPG.query('SELECT last_used, nbr_mot FROM users WHERE email = $1', [req.user]);
+      const getUser = await DataBase.query('SELECT last_used, nbr_mot FROM users WHERE email = $1', [req.user]);
   
       if (!getUser.rows[0]) return res.status(403).json({ error: "user doesn't exist" });
   
